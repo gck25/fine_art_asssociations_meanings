@@ -284,7 +284,7 @@ if __name__ == '__main__':
 
     # Parse command line arguments
     parser = argparse.ArgumentParser(
-        description='Train Mask R-CNN to detect semioticss.')
+        description='Train Mask R-CNN to detect semiotics.')
     parser.add_argument("command",
                         metavar="<command>",
                         help="'train' or 'splash'")
