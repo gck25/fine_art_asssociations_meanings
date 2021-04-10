@@ -146,7 +146,7 @@ if __name__ == '__main__':
         model = modellib.MaskRCNN(mode="inference", config=config, model_dir=args.logs)
 
     # Select weights file to load
-    if args.weights.lower() == "coco":
+    if args.weights.lower() == "../data/coco_weights":
         weights_path = COCO_WEIGHTS_PATH
         # Download weights file
         if not os.path.exists(weights_path):
@@ -162,7 +162,7 @@ if __name__ == '__main__':
 
     # Load weights
     print("Loading weights ", weights_path)
-    if args.weights.lower() == "coco":
+    if args.weights.lower() == "../data/coco_weights":
         # Exclude the last layers because they require a matching
         # number of classes
         model.load_weights(weights_path, by_name=True, exclude=[

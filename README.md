@@ -11,6 +11,7 @@ cd mrcnn
 pip install -r requirements.txt
 python3 setup.py install
 
-pip install scikit-image jupyter
+pip install jupyter
+pip install scikit-image==0.16.2
 
 ```
