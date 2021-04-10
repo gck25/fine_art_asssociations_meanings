@@ -49,12 +49,12 @@ def train(model):
     """Train the model."""
     # Training dataset.
     dataset_train = VanitasDataset()
-    dataset_train.load_semiotics(args.dataset, "train")
+    dataset_train.load_vanitas(args.dataset, "train")
     dataset_train.prepare()
 
     # Validation dataset
     dataset_val = VanitasDataset()
-    dataset_val.load_semiotics(args.dataset, "val")
+    dataset_val.load_vanitas(args.dataset, "val")
     dataset_val.prepare()
 
     # *** This training schedule is an example. Update to your needs ***
@@ -111,7 +111,7 @@ if __name__ == '__main__':
     # Parse command line arguments
     parser = argparse.ArgumentParser(description='Train Mask R-CNN to detect semiotics.')
     parser.add_argument("command", default='train', help="'train' or 'splash'")
-    parser.add_argument('--dataset', required=False, default='data/vanitas_json', help='Directory of the semiotics dataset')
+    parser.add_argument('--dataset', required=False, default='../data/vanitas_json', help='Directory of the semiotics dataset')
     parser.add_argument('--weights', required=True, metavar="/path/to/weights.h5", help="Path to weights .h5 file or 'coco'")
     parser.add_argument('--logs', required=False, default=DEFAULT_LOGS_DIR, metavar="/path/to/logs/", help='Logs and checkpoints directory (default=logs/)')
     parser.add_argument('--image', required=False, metavar="path or URL to image", help='Image to apply the color splash effect on')
@@ -146,7 +146,7 @@ if __name__ == '__main__':
         model = modellib.MaskRCNN(mode="inference", config=config, model_dir=args.logs)
 
     # Select weights file to load
-    if args.weights.lower() == "coco":
+    if args.weights.lower() == "../data/coco_weights":
         weights_path = COCO_WEIGHTS_PATH
         # Download weights file
         if not os.path.exists(weights_path):
@@ -162,7 +162,7 @@ if __name__ == '__main__':
 
     # Load weights
     print("Loading weights ", weights_path)
-    if args.weights.lower() == "coco":
+    if args.weights.lower() == "../data/coco_weights":
         # Exclude the last layers because they require a matching
         # number of classes
         model.load_weights(weights_path, by_name=True, exclude=[
