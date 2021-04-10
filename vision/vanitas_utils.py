@@ -44,9 +44,10 @@ class VanitasDataset(utils.Dataset):
 
         # Add classes.
 
-        keys = ['Skull', 'Hourglass', 'Globe', 'Coins', 'Butterfly', 'Flowers', 'Watch', 'Dice', 'Fruit', 'Violin',
+        keys = ['Skull', 'Hourglass', 'Globe', 'Coins', 'Butterfly ', 'Flowers', 'Watch', 'Dice', 'Fruit', 'violin',
                 'Lute', 'Flute', 'Candle', 'Inkstand', 'Music', 'Bubble', 'Lamp', 'Book', 'Glass', 'Goblet', 'Vase',
-                'Crown', 'Bishop\'s mitre', 'Crab', 'Lobster', 'Seashells', 'Chicken']
+                'Crown', 'Bishop\'s mitre', 'Bishop\'s Mitre', 'Crab', 'Lobster', 'Seashells', 'Chicken', 'Atlas',
+                'Clock', 'Fish', 'Smoke', 'Bread', 'Wine', 'sea shells']
 
         for i in range(len(keys)):
             self.add_class('vanitas', i + 1, keys[i])
@@ -102,8 +103,8 @@ class VanitasDataset(utils.Dataset):
         # Convert polygons to a bitmap mask of shape
         # [height, width, instance_count]
         info = self.image_info[image_id]
-        mask = np.zeros([info["height"], info["width"], len(info["polygons"])],
-                        dtype=np.uint8)
+        mask = np.zeros([info["height"], info["width"], len(info["polygons"])], dtype=np.uint8)
+
         for i, p in enumerate(info["polygons"]):
             # Get indexes of pixels inside the polygon and set them to 1
             rr, cc = skimage.draw.rectangle((int(p['top']), int(p['left'])), ((int(p['top'])+int(p['height'])), (int(p['left'])+int(p['width']))))
@@ -111,19 +112,23 @@ class VanitasDataset(utils.Dataset):
 
         # Return mask, and array of class IDs of each instance.
         class_ids = np.zeros([mask.shape[-1]], dtype=np.int32)
-        for i in range(len(info["labels"][0])):
-            if info["labels"][0][i] == 'Key':
-                class_ids[i] = 1
-            if info["labels"][0][i] == 'cross':
-                class_ids[i] = 2
-            if info["labels"][0][i] == 'winged_lion':
-                class_ids[i] = 3
+
+        keys = ['Skull', 'Hourglass', 'Globe', 'Coins', 'Butterfly ', 'Flowers', 'Watch', 'Dice', 'Fruit', 'violin',
+                'Lute', 'Flute', 'Candle', 'Inkstand', 'Music', 'Bubble', 'Lamp', 'Book', 'Glass', 'Goblet', 'Vase',
+                'Crown', 'Bishop\'s mitre', 'Bishop\'s Mitre', 'Crab', 'Lobster', 'Seashells', 'Chicken', 'Atlas',
+                'Clock', 'Fish', 'Smoke', 'Bread', 'Wine', 'sea shells']
+
+        for i in range(len(info["labels"])):
+            for j in range(len(keys)):
+                if info["labels"][i][0] == keys[j]:
+                    class_ids[i] = j + 1
+                    continue
         return mask.astype(np.bool), class_ids
 
     def image_reference(self, image_id):
         """Return the path of the image."""
         info = self.image_info[image_id]
-        if info["source"] == "semiotics":
+        if info["source"] == "vanitas":
             return info["path"]
         else:
             super(self.__class__, self).image_reference(image_id)
@@ -150,3 +155,12 @@ if __name__ == '__main__':
     print("Class Count: {}".format(dataset.num_classes))
     for i, info in enumerate(dataset.class_info):
         print("{:3}. {:50}".format(i, info['name']))
+
+    # Load and display random samples
+    np.random.seed(4)
+    image_ids = np.random.choice(dataset.image_ids, 9)
+    print(image_ids)
+    for image_id in image_ids:
+        image = dataset.load_image(image_id)
+        mask, class_ids = dataset.load_mask(image_id)
+        print(class_ids)
