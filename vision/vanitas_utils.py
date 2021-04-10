@@ -136,6 +136,8 @@ class VanitasDataset(utils.Dataset):
 
 if __name__ == '__main__':
 
+    # Test that class labels load correctly.
+
     import os
 
     # Root directory of the project
