@@ -49,8 +49,7 @@ class VanitasDataset(utils.Dataset):
                 'Crown', 'Bishop\'s mitre', 'Crab', 'Lobster', 'Seashells', 'Chicken']
 
         for i in range(len(keys)):
-            i += 1
-            self.add_class('vanitas', i, keys[i])
+            self.add_class('vanitas', i + 1, keys[i])
 
         # Train or validation dataset?
         assert subset in ["train", "val"]
@@ -62,14 +61,11 @@ class VanitasDataset(utils.Dataset):
             if file[-5:] == '.json':
                 annotations.append(json.load(open(os.path.join(dataset_dir, file))))
 
-        # The VIA tool saves images in the JSON even if they don't have any
-        # annotations. Skip unannotated images.
         # Add images
         for a in annotations:
-            # Get the x, y coordinaets of points of the polygons that make up
-            # the outline of each object instance. These are stores in the
+            # Get the x, y coordinates of points of the polygons that make up
+            # the outline of each object instance. These are stored in the
             # shape_attributes (see json format above)
-            # The if condition is needed to support VIA versions 1.x and 2.x.
             filename = a['asset']['name']
             image_path = os.path.join(dataset_dir, filename)
             image = skimage.io.imread(image_path)
@@ -80,12 +76,12 @@ class VanitasDataset(utils.Dataset):
             else:
                 polygons = [r['boundingBox'] for r in a['regions']]
                 tags = [r['tags'] for r in a['regions']]
+
             # load_mask() needs the image size to convert polygons to masks.
             # Unfortunately, VIA doesn't include it in JSON, so we must read
             # the image. This is only managable since the dataset is tiny.
 
-            self.add_image(
-                "vanitas",
+            self.add_image("vanitas",
                 image_id=filename,  # use file name as a unique image id
                 path=image_path,
                 width=width, height=height,
@@ -131,3 +127,26 @@ class VanitasDataset(utils.Dataset):
             return info["path"]
         else:
             super(self.__class__, self).image_reference(image_id)
+
+
+if __name__ == '__main__':
+
+    import os
+
+    # Root directory of the project
+    ROOT_DIR = os.path.abspath("../")
+
+    # Load dataset
+    # Get the dataset from the releases page
+    # https://github.com/matterport/Mask_RCNN/releases
+    dataset = VanitasDataset()
+    VANITAS_DIR = os.path.join(ROOT_DIR, "data/vanitas_json")
+    dataset.load_vanitas(VANITAS_DIR, "train")
+
+    # Must call before using the dataset
+    dataset.prepare()
+
+    print("Image Count: {}".format(len(dataset.image_ids)))
+    print("Class Count: {}".format(dataset.num_classes))
+    for i, info in enumerate(dataset.class_info):
+        print("{:3}. {:50}".format(i, info['name']))
