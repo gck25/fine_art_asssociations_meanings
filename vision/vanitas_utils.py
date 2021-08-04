@@ -4,7 +4,6 @@ Author: Ryan-Rhys Griffiths 2021
 """
 
 import json
-import os
 
 import numpy as np
 import skimage
