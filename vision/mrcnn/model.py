@@ -951,6 +951,7 @@ def fpn_classifier_graph(rois, feature_maps, image_meta,
 
     # BBox head
     # [batch, num_rois, NUM_CLASSES * (dy, dx, log(dh), log(dw))]
+    print(num_classes)
     x = KL.TimeDistributed(KL.Dense(num_classes * 4, activation='linear'),
                            name='mrcnn_bbox_fc')(shared)
     # Reshape to [batch, num_rois, NUM_CLASSES, (dy, dx, log(dh), log(dw))]
@@ -1793,6 +1794,7 @@ class MaskRCNN(object):
         self.model_dir = model_dir
         self.set_log_dir()
         self.keras_model = self.build(mode=mode, config=config)
+        self.keras_model.metrics_tensors = [] 
 
     def build(self, mode, config):
         """Build Mask R-CNN architecture.
@@ -2076,6 +2078,7 @@ class MaskRCNN(object):
 
         if exclude:
             by_name = True
+            
 
         if h5py is None:
             raise ImportError('`load_weights` requires h5py.')
