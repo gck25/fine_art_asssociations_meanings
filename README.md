@@ -2,10 +2,12 @@
 
 ## Install 
 
-We recommend using a conda environment
+We recommend using a conda environment. requirements.txt at the top level should contain all requirements.
 
 ```
 conda create -n ai_art python==3.8
+
+pip install -r requirements.txt
 
 cd mrcnn
 pip install -r requirements.txt
