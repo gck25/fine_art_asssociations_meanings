@@ -7,7 +7,6 @@ from nlp.data.test_set_artists_titles import TEST_SET_ARTSISTS_TITLES
 from nlp.kg_utils import find_train_test_split,\
                         create_edge_weight_dict,\
                         create_kg_from_dict,\
-                        display_kg,\
                         save_admatrix_nodelist,\
                         refine_kg_to_include_only_relevant_objects
 
@@ -24,28 +23,34 @@ semantic_threshold = 0.7
 
 def main():
 
+    # load web texts
     with open(web_text_path) as f:
         web_texts = json.load(f)
 
+    # train-test split
     train_texts, test_texts = find_train_test_split(web_texts, TEST_SET_ARTSISTS_TITLES)
 
+    # create head-tails dictionary from train texts
     ht_dict = create_edge_weight_dict(train_texts)
 
+    # create knowledge graph from head-tails dict
     kg = create_kg_from_dict(ht_dict, edge_threshold=edge_threshold)
 
     if not os.path.exists(dst_dir):
         os.mkdir((dst_dir))
 
-    dst_path_kg = os.path.join(dst_dir, kg_file)
-    nx.write_gpickle(kg, dst_path_kg)
-
-    save_admatrix_nodelist(kg, dst_dir)
-    # display_kg(kg)
-
+    # refine KG to include only objects detected by object detector
     kg = refine_kg_to_include_only_relevant_objects(kg)
 
+    # save KG, adjacency matrix and nodelist
+    dst_path_kg = os.path.join(dst_dir, kg_file)
+    nx.write_gpickle(kg, dst_path_kg)
+    save_admatrix_nodelist(kg, dst_dir)
+
+    # calculate hard and soft metrics
     hard_metrics, soft_metrics = calc_soft_hard_metrics(kg, GOLD_STANDARD)
 
+    # calculate semantic metrics
     sem_p, sem_r, sem_f1 = calc_semantic_metrics(kg, GOLD_STANDARD, semantic_threshold)
 
     print("########### NLP Component ###########")
