@@ -5,23 +5,28 @@ model_embed = SentenceTransformer('sentence-transformers/bert-base-nli-mean-toke
 
 
 def calc_precision(TP, FP):
+    # calculate precision
     return TP/(TP+FP + 1e-15)
 
 
 def calc_recall(TP, FN):
+    # calculate recall
     return TP/(TP + FN + 1e-15)
 
 
 def calc_f1(p, r):
+    # calculate F1
     return 2*p*r/(p + r + 1e-15)
 
 
 def cos_sim(e1, e2):
+    # cosine similarity
     e2_r = e2.reshape(1, -1)
     return cosine_similarity(e1, e2_r)
 
 
-def calc_semantic_helper(s, S, threshold):
+def calc_semantic_helper(s, S, semantic_threshold):
+    # helper function for semantic metrics
     e_s = model_embed.encode(s).reshape(1, -1)
     e_S = model_embed.encode(S)
 
@@ -34,7 +39,7 @@ def calc_semantic_helper(s, S, threshold):
 
     for i in range(len(e_S)):
 
-        if cos_sim(e_s, e_S[i])[0][0] >= threshold:
+        if cos_sim(e_s, e_S[i])[0][0] >= semantic_threshold:
             TP += 1
             under_threshold_for_all = False
         else:
@@ -46,6 +51,14 @@ def calc_semantic_helper(s, S, threshold):
     return set(rejected), TP, FP
 
 def calc_semantic_metrics(SG, gold_standard, semantic_threshold):
+    """
+    Calculate semantic metrics (based on semantic similarity)
+
+    :param SG: Sub graph
+    :param gold_standard: test set
+    :param semantic_threshold: threshold to defined similarity
+    :return: precision, recall, F1
+    """
     FP = 0
     FN = 0
     TP = 0
@@ -79,6 +92,13 @@ def calc_semantic_metrics(SG, gold_standard, semantic_threshold):
 
 
 def calc_soft_hard_metrics(SG, gold_standard):
+    """
+    Calculate hard (exact matches) and soft (partial matches) metrics
+
+    :param SG: Sub graph
+    :param gold_standard: test set
+    :return: hard and soft metrics
+    """
     hard_true_positives = 0
     hard_false_positives = 0
 
