@@ -7,13 +7,14 @@ We recommend using a conda environment. requirements.txt at the top level should
 ```
 conda create -n ai_art python==3.8
 
-pip install -r requirements.txt
-
 cd mrcnn
 pip install -r requirements.txt
 python3 setup.py install
 
 pip install jupyter
 pip install scikit-image==0.16.2
+
+cd nlp
+pip install -r requirements.txt
 
 ```
